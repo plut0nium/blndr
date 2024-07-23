@@ -1,7 +1,7 @@
 #! /bin/env python
 
 from blndr import gas
-from blndr.blndr import make_fill_plan
+from blndr import make_fill_plan
 
 if __name__ == "__main__":
     volume = 10.0
@@ -24,5 +24,4 @@ if __name__ == "__main__":
     print("[STEPS]")
     for i, s in enumerate(steps):
         print(f" {i+1}. {s}")
-
 

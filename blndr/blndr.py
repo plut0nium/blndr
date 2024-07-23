@@ -5,6 +5,7 @@ def make_fill_plan(gas_target:gas.GasMix, pressure_target:float = 200.0,
                    gas_initial:gas.GasMix|None = None, pressure_initial:float = 0.0,
                    volume:float = 10.0, temperature:float = 20.0,
                    gas_top_up:gas.GasMix|None = None) -> list[str]:
+    # default to AIR
     if gas_initial is None:
         gas_initial = gas.AIR
     if gas_top_up is None:
@@ -53,11 +54,11 @@ def make_fill_plan(gas_target:gas.GasMix, pressure_target:float = 200.0,
         moles_O2_fill = moles_target[0] - moles_current[0] - moles_top_up[0]
         moles_He_fill = moles_target[1] - moles_current[1] - moles_top_up[1]
 
-    if ideal.get_pressure(sum(moles_current), volume, temperature) < ideal.get_pressure(sum(moles_initial), volume, temperature):
-        steps.append(f"[BLEED] down to {ideal.get_pressure(sum(moles_current), volume, temperature):.2f} bar")
-
     if moles_O2_fill < 0.0 or moles_He_fill < 0.0:
         raise ValueError("Unable to blend this mix using the available gases")
+
+    if ideal.get_pressure(sum(moles_current), volume, temperature) < pressure_initial:
+        steps.append(f"[BLEED] down to {ideal.get_pressure(sum(moles_current), volume, temperature):.2f} bar")
 
     if moles_O2_fill > 0.0:
         moles_current[0] += moles_O2_fill
