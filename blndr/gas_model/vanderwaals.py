@@ -1,5 +1,7 @@
 from itertools import product
 from math import sqrt
+from scipy.optimize import brentq
+from . import ideal
 
 from ..common import *
 
@@ -48,7 +50,9 @@ def _get_moles_SI(p:float, V:float, T:float, fractions:tuple[float]) -> float:
     def vdw_solve_n(n: float) -> float:
         # maybe use a partial() here...
         return (p + a * (n / V)**2.0) * (V - n * b) - n * R_IDEAL_GASES * T
-    return (p * V) / (R_IDEAL_GASES * T)
+    root_estimate = ideal.get_moles(p, V, T, SI=True)
+    root = brentq(vdw_solve_n, root_estimate / 2.0, root_estimate * 2.0)
+    return root
 
 if __name__ == "__main__":
     AIR = (0.2095, 0.0, 0.7905)
