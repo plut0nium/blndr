@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "blndr"
+version = "0.1"
+dependencies = []
+description = "Scuba gas blending"
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+
+[project.urls]
+Repository = "https://github.com/me/spam.git"
+
+[project.scripts]
+blndr-cli = "blndr:main"
