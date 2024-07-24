@@ -32,8 +32,18 @@ def make_fill_plan(gas_target:gas.GasMix, pressure_target:float = 200.0,
                 moles_current[i] *= 1.0 / bleed_ratio
         #print("[BLEED] to", ideal.get_pressure(sum(moles_current), volume, temperature), "bar")
 
-    moles_total_top_up = (moles_target[2] - moles_current[2]) / gas_top_up.N2
+    if (moles_target[2] - moles_current[2]) > 0 and gas_top_up.N2 == 0.0:
+        # we need N2 but none is available
+        raise ValueError("A source of N2 (top-up gas) is required for this Mix")
+    if gas_top_up.N2 > 0.0:
+        moles_total_top_up = (moles_target[2] - moles_current[2]) / gas_top_up.N2
+    else:
+        # no top-up if N2 fraction = 0
+        moles_total_top_up = 0.0
     moles_top_up = tuple(x * moles_total_top_up for x in gas_top_up.fractions)
+
+    # TODO: check that the fraction of N2 is high enough to reach target without overfilling
+    # ideas: gas_top_up.N2 > gas_target.N2
 
     moles_O2_fill = moles_target[0] - moles_current[0] - moles_top_up[0]
     moles_He_fill = moles_target[1] - moles_current[1] - moles_top_up[1]
@@ -48,7 +58,11 @@ def make_fill_plan(gas_target:gas.GasMix, pressure_target:float = 200.0,
         # print("[BLEED] (2) to", ideal.get_pressure(sum(moles_current), volume, temperature), "bar")
 
         # recalculate top-up & fill
-        moles_total_top_up = (moles_target[2] - moles_current[2]) / gas_top_up.N2
+        if gas_top_up.N2 > 0.0:
+            moles_total_top_up = (moles_target[2] - moles_current[2]) / gas_top_up.N2
+        else:
+            # no top-up if N2 fraction = 0
+            moles_total_top_up = 0.0
         moles_top_up = tuple(x * moles_total_top_up for x in gas_top_up.fractions)
 
         moles_O2_fill = moles_target[0] - moles_current[0] - moles_top_up[0]
