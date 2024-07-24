@@ -17,10 +17,10 @@ VDW_PARAMETERS = [
 ]
 
 def mixing_rules(fractions: tuple[float]) -> tuple[float]:
-    '''Applied mixing rules for VDW parameters 
+    '''Apply mixing rules for VDW parameters.
 
     Calculate the VDW parameters (a, b + molar weight) for the mix,
-    in SI units, using the general mixing rules (see wikipedia)
+    in SI units, using the general mixing rules (see wikipedia).
     
     Args:
         fractions (tuple): the gas mix for which VDW parameters should be calculated,
@@ -29,22 +29,17 @@ def mixing_rules(fractions: tuple[float]) -> tuple[float]:
     
     Returns:
         a 3-values tuple, containing:
-        - a (float): the interaction parameter 
-        - b (float): the molar covolume
-        - mw (float): the averaged molar weight of the mix
+        - a (float): the interaction parameter [m^6 * Pa * mol^-2]
+        - b (float): the molar covolume parameter [m^3 * mol^-1]
+        - mw (float): the averaged molar weight of the mix [g * mol^-1]
     '''
-    if isinstance(gas, GasMix):
-        fractions = gas.fractions
-    else: # tuple
-        assert(len(gas == 3))
-        fractions = gas
     a_mix = sum(fractions[i] * fractions[j] * sqrt(VDW_PARAMETERS[i][0] * VDW_PARAMETERS[j][0]) for i,j in product(range(3), repeat=2))
     b_mix = sum(fractions[i] * VDW_PARAMETERS[i][1] for i in range(3))
     mw_mix = sum(fractions[i] * VDW_PARAMETERS[i][2] for i in range(3))
     return a_mix, b_mix, mw_mix
 
 def get_pressure(n:float, V:float, T:float, fractions:tuple[float], use_SI:bool = False) -> float:
-    '''Wrapper function for unit management'''
+    '''Wrapper function for unit management.'''
     if use_SI:
         return _get_pressure_SI(n, V, T, fractions)
     return _get_pressure_SI(n,
@@ -53,10 +48,10 @@ def get_pressure(n:float, V:float, T:float, fractions:tuple[float], use_SI:bool 
                             fractions) / BAR_TO_PASCAL
 
 def _get_pressure_SI(n:float, V:float, T:float, fractions:tuple[float]) -> float:
-    '''Use VDW equation to calculate the pressure of a gas
+    '''Use VDW equation to calculate the pressure of a gas.
 
     Calculate the pressure of a gas mix given the number of moles, the volume
-    and the temperature, using the Van Der Waals equation of state
+    and the temperature, using the Van Der Waals equation of state.
 
     Note:
         Should not be called directly, but by get_pressure(...)
@@ -77,7 +72,7 @@ def _get_pressure_SI(n:float, V:float, T:float, fractions:tuple[float]) -> float
     return ((n * R_IDEAL_GASES * T) / (V - n * b)) - (a * (n / V)**2.0)
 
 def get_moles(p:float, V:float, T:float, fractions:tuple[float], SI:bool = False) -> float:
-    '''Wrapper function for unit management'''
+    '''Wrapper function for unit management.'''
     if SI:
         return _get_moles_SI(p, V, T)
     return _get_moles_SI(p * BAR_TO_PASCAL,
@@ -86,7 +81,7 @@ def get_moles(p:float, V:float, T:float, fractions:tuple[float], SI:bool = False
                          fractions)
 
 def _get_moles_SI(p:float, V:float, T:float, fractions:tuple[float]) -> float:
-    '''Use VDW equation to calculate the number of moles of a gas
+    '''Use VDW equation to calculate the number of moles of a gas.
 
     Calculate the number of moles of a gas mix given the pressure, the volume
     and the temperature, using a root-finding algorithms applied to the
