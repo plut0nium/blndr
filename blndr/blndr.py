@@ -1,5 +1,13 @@
 from . import gas
 from .gas_model import ideal, vanderwaals
+from enum import Enum
+
+
+class FillStep(Enum):
+    BLEED = "BLEED"
+    FILL = "FILL"
+    TOP_UP = "TOP-UP"
+
 
 def make_fill_plan(gas_target:gas.GasMix, pressure_target:float = 200.0,
                    gas_initial:gas.GasMix|None = None, pressure_initial:float = 0.0,
